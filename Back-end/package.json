@@ -1,0 +1,38 @@
+{
+  "name": "back-end",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "scripts": {
+    "start": "nodemon --exec tsx index.ts",
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "type": "module",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@clerk/backend": "^1.33.1",
+    "@clerk/express": "^1.5.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "esm": "^3.2.25",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.16.0",
+    "mongoose": "^8.15.1",
+    "tsx": "^4.19.4",
+    "uuid": "^11.1.0",
+    "ws": "^8.18.2"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.18",
+    "@types/express": "^5.0.2",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/node": "^22.15.24",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "tslib": "^2.8.1",
+    "typescript": "^5.8.3"
+  }
+}
