@@ -9,19 +9,14 @@ import {
   Instagram,
   Linkedin,
   Github,
-  ArrowRight,
   Mail,
   Phone,
   MapPin,
   Heart,
-  Users,
 } from "lucide-react";
-
-import { useRouter } from "next/navigation";
 
 export const EnhancedFooter = () => {
   const [hoveredSocial, setHoveredSocial] = useState<string | null>(null);
-  const { push } = useRouter();
 
   // Create stable particle positions to avoid hydration mismatch
   const particles = Array.from({ length: 50 }, (_, i) => ({
@@ -31,10 +26,6 @@ export const EnhancedFooter = () => {
     duration: 3 + ((i * 3.1) % 2),
     delay: (i * 5.2) % 5,
   }));
-
-  const handleNavigate = (route: string) => {
-    push(route);
-  };
 
   const containerVariants = {
     hidden: { opacity: 0 },

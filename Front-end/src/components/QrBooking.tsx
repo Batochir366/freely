@@ -42,7 +42,7 @@ export const QrBooking = () => {
     };
 
     createQrSession();
-  }, []);
+  }, [setScanned]);
 
   const qrUrl = qrId
     ? `https://teamproject-mongodb.onrender.com/qr/scan/${qrId}`

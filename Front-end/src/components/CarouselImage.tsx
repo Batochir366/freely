@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 type Images = {
   images: string[] | null;
@@ -33,9 +34,12 @@ export const CarouselImage = ({ images }: Images) => {
       {images && (
         <div className="relative bg-white rounded-3xl overflow-hidden shadow-soft-lg border border-gray-100/50">
           <div className="relative aspect-video">
-            <img
+            <Image
               src={images[currentSlide]}
               className="w-full h-full object-cover"
+              alt={`Carousel image ${currentSlide + 1}`}
+              width={800}
+              height={450}
             />
 
             {/* Overlay Gradient */}
@@ -75,7 +79,13 @@ export const CarouselImage = ({ images }: Images) => {
                   : "border-gray-200 hover:border-mint"
               }`}
             >
-              <img src={image} className="w-full h-full object-cover" />
+              <Image
+                src={image}
+                className="w-full h-full object-cover"
+                alt={`Thumbnail ${index + 1}`}
+                width={100}
+                height={60}
+              />
             </button>
           ))}
       </div>

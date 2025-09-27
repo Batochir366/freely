@@ -87,7 +87,7 @@ export default function ExplorePage() {
     };
 
     fetchCompanies();
-  }, [search, selectedCategories]);
+  }, [search, selectedCategories, setLoading]);
 
   console.log(companies);
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Eye, Plus, Save, Trash, Trash2 } from "lucide-react";
@@ -64,7 +64,7 @@ export const AdminSettings = () => {
     pricing: "",
   });
 
-  const fetchCompanyData = async () => {
+  const fetchCompanyData = useCallback(async () => {
     try {
       const response = await axiosInstance.get(
         `/company/get-company/${params.id}`
@@ -73,11 +73,11 @@ export const AdminSettings = () => {
     } catch (error) {
       console.error("Error fetching company data:", error);
     }
-  };
+  }, [params.id]);
 
   useEffect(() => {
     fetchCompanyData();
-  }, []);
+  }, [fetchCompanyData]);
 
   const [showPreview, setShowPreview] = useState(false);
 

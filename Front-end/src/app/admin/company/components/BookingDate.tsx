@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { format, addDays, isWeekend, startOfDay, isSameDay } from "date-fns";
 import { ChevronRight, Wallet, ChevronLeft, X } from "lucide-react";
 import {
@@ -190,7 +190,7 @@ export const BookingDate = ({ price }: { price: number | undefined }) => {
     }
   };
 
-  const handleBooking = () => {
+  const handleBooking = useCallback(() => {
     const fetchBooking = async () => {
       try {
         for (const booking of bookings) {
@@ -225,9 +225,9 @@ export const BookingDate = ({ price }: { price: number | undefined }) => {
     };
     fetchBooking();
     toast("time booked successfully");
-  };
+  }, [bookings, params.id]);
 
-  const fetchBookingData = () => {
+  const fetchBookingData = useCallback(() => {
     const fetchBooking = async () => {
       try {
         const res = await axiosInstance.get(
@@ -239,11 +239,11 @@ export const BookingDate = ({ price }: { price: number | undefined }) => {
       }
     };
     fetchBooking();
-  };
+  }, [params.id]);
 
   useEffect(() => {
     fetchBookingData();
-  }, []);
+  }, [fetchBookingData]);
 
   useEffect(() => {
     if (scanned == true) {
@@ -252,7 +252,7 @@ export const BookingDate = ({ price }: { price: number | undefined }) => {
     }
     setScanned(false);
     fetchBookingData();
-  }, [scanned]);
+  }, [scanned, handleBooking, setScanned, fetchBookingData]);
 
   // Mobile Day Selection Component
   const MobileDaySelector = () => (
