@@ -6,6 +6,7 @@ import { dark } from "@clerk/themes";
 import { CategoryProvider } from "./context/CategoryContext";
 import { LoadingProvider } from "./context/LoadingContext";
 import { ScanProvider } from "./context/ScanContext";
+import { configDotenv } from "dotenv";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,6 +23,7 @@ function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  configDotenv();
   const clerkPublishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
   if (!clerkPublishableKey) {
