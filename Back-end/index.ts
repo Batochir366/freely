@@ -1,13 +1,13 @@
-const express = require("express");
-const cors = require("cors");
-const { configDotenv } = require("dotenv");
-const connectMongoDB = require("./connectDb").default;
-const usersRouter = require("./routes/user").default;
-const companyRouter = require("./routes/company").default;
-const reviewsRouter = require("./routes/review").default;
-const bookingRouter = require("./routes/booking").default;
-const categoryRouter = require("./routes/category").default;
-const { qrRoutes } = require("./routes/qrRoutes");
+import express from "express";
+import cors from "cors";
+import { configDotenv } from "dotenv";
+import connectMongoDB from "./connectDb";
+import usersRouter from "./routes/user";
+import companyRouter from "./routes/company";
+import reviewsRouter from "./routes/review";
+import bookingRouter from "./routes/booking";
+import categoryRouter from "./routes/category";
+import { qrRoutes } from "./routes/qrRoutes";
 
 const app = express();
 const publicRouter = express.Router();
