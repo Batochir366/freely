@@ -1,22 +1,21 @@
-import express, { json } from "express";
-import cors from "cors";
-import { configDotenv } from "dotenv";
-import connectMongoDB from "./connectDb";
-import usersRouter from "./routes/user";
-import companyRouter from "./routes/company";
-import reviewsRouter from "./routes/review";
-import bookingRouter from "./routes/booking";
-import categoryRouter from "./routes/category";
-import { qrRoutes } from "./routes/qrRoutes";
-import { initWebSocket } from "./websocket";
-import http from "http";
+"use strict";
+const express = require("express");
+const cors = require("cors");
+const { configDotenv } = require("dotenv");
+const connectMongoDB = require("./connectDb").default;
+const usersRouter = require("./routes/user").default;
+const companyRouter = require("./routes/company").default;
+const reviewsRouter = require("./routes/review").default;
+const bookingRouter = require("./routes/booking").default;
+const categoryRouter = require("./routes/category").default;
+const { qrRoutes } = require("./routes/qrRoutes");
 const app = express();
 const publicRouter = express.Router();
 configDotenv();
 const port = process.env.PORT || 8000;
 connectMongoDB();
 app.use(cors());
-app.use(json());
+app.use(express.json());
 app.use("/category", categoryRouter);
 app.get("/pp", (req, res) => {
     res.send("hello world");
@@ -27,9 +26,12 @@ app.use("/company", companyRouter);
 app.use("/review", reviewsRouter);
 app.use("/booking", bookingRouter);
 app.use("/qr", qrRoutes);
-const server = http.createServer(app);
-initWebSocket(server);
-server.listen(port, () => {
-    console.log(`Server running at PORT: http://localhost:${port}`);
+app.get("/health", (req, res) => {
+    res.status(200).json({ status: "OK", timestamp: new Date().toISOString() });
 });
-//# sourceMappingURL=index.js.map
+module.exports = app;
+if (process.env.NODE_ENV !== "production") {
+    app.listen(port, () => {
+        console.log(`Server running at PORT: http://localhost:${port}`);
+    });
+}

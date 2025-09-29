@@ -1,9 +1,15 @@
-import express from "express";
-import { createBooking, getBookingsByUser, getBookingsByCompany, updateBookingStatus, getBookingsByUserCompanies, } from "../controllers/booking";
-export const bookingRouter = express.Router();
-bookingRouter.post("/create-booking", async (req, res) => {
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.bookingRouter = void 0;
+const express_1 = __importDefault(require("express"));
+const booking_1 = require("../controllers/booking");
+exports.bookingRouter = express_1.default.Router();
+exports.bookingRouter.post("/create-booking", async (req, res) => {
     try {
-        await createBooking(req, res);
+        await (0, booking_1.createBooking)(req, res);
     }
     catch (error) {
         console.error(error);
@@ -13,9 +19,9 @@ bookingRouter.post("/create-booking", async (req, res) => {
         });
     }
 });
-bookingRouter.post("/user-bookings", async (req, res) => {
+exports.bookingRouter.post("/user-bookings", async (req, res) => {
     try {
-        await getBookingsByUser(req, res);
+        await (0, booking_1.getBookingsByUser)(req, res);
     }
     catch (error) {
         console.error(error);
@@ -25,9 +31,9 @@ bookingRouter.post("/user-bookings", async (req, res) => {
         });
     }
 });
-bookingRouter.get("/company-bookings/:companyId", async (req, res) => {
+exports.bookingRouter.get("/company-bookings/:companyId", async (req, res) => {
     try {
-        await getBookingsByCompany(req, res);
+        await (0, booking_1.getBookingsByCompany)(req, res);
     }
     catch (error) {
         console.error(error);
@@ -37,9 +43,9 @@ bookingRouter.get("/company-bookings/:companyId", async (req, res) => {
         });
     }
 });
-bookingRouter.post("/update-status/:bookingId", async (req, res) => {
+exports.bookingRouter.post("/update-status/:bookingId", async (req, res) => {
     try {
-        await updateBookingStatus(req, res);
+        await (0, booking_1.updateBookingStatus)(req, res);
     }
     catch (error) {
         console.error(error);
@@ -49,9 +55,9 @@ bookingRouter.post("/update-status/:bookingId", async (req, res) => {
         });
     }
 });
-bookingRouter.post("/user-company-bookings", async (req, res) => {
+exports.bookingRouter.post("/user-company-bookings", async (req, res) => {
     try {
-        await getBookingsByUserCompanies(req, res);
+        await (0, booking_1.getBookingsByUserCompanies)(req, res);
     }
     catch (error) {
         console.error(error);
@@ -61,5 +67,4 @@ bookingRouter.post("/user-company-bookings", async (req, res) => {
         });
     }
 });
-export default bookingRouter;
-//# sourceMappingURL=booking.js.map
+exports.default = exports.bookingRouter;

@@ -1,7 +1,13 @@
-import BookingModel from "../model/booking";
-import CompanyModel from "../model/company";
-import UserModel from "../model/user";
-export const createBookings = async (req, res) => {
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.updateBookingStatus = exports.getBookingsByUserCompanies = exports.getBookingsByCompany = exports.getBookingsByUser = exports.createBooking = exports.createBookings = void 0;
+const booking_1 = __importDefault(require("../model/booking"));
+const company_1 = __importDefault(require("../model/company"));
+const user_1 = __importDefault(require("../model/user"));
+const createBookings = async (req, res) => {
     try {
         const { bookings } = req.body;
         const userId = req.userId || "default-user";
@@ -21,7 +27,7 @@ export const createBookings = async (req, res) => {
                 : bookingData.endTime.replace(/:/g, "");
             const [year, month, day] = bookingData.bookingDate.split("-").map(Number);
             const bookingDate = new Date(Date.UTC(year, month - 1, day));
-            return BookingModel.create({
+            return booking_1.default.create({
                 user: userId,
                 company: bookingData.companyId,
                 bookingDate: bookingDate,
@@ -46,12 +52,13 @@ export const createBookings = async (req, res) => {
         });
     }
 };
-export const createBooking = async (req, res) => {
+exports.createBookings = createBookings;
+const createBooking = async (req, res) => {
     try {
         const { companyId, bookingDate, startTime, endTime, price, userId, userEmail, } = req.body;
         let finalUserId = userId;
         if (userEmail && !userId) {
-            const user = await UserModel.findOne({ email: userEmail });
+            const user = await user_1.default.findOne({ email: userEmail });
             if (!user) {
                 res.status(200).json({
                     success: false,
@@ -70,7 +77,7 @@ export const createBooking = async (req, res) => {
         }
         const formattedStartTime = startTime.length === 5 ? startTime : startTime.replace(/:/g, "");
         const formattedEndTime = endTime.length === 5 ? endTime : endTime.replace(/:/g, "");
-        const booking = await BookingModel.create({
+        const booking = await booking_1.default.create({
             user: finalUserId,
             company: companyId,
             bookingDate: new Date(bookingDate),
@@ -92,7 +99,8 @@ export const createBooking = async (req, res) => {
         });
     }
 };
-export const getBookingsByUser = async (req, res) => {
+exports.createBooking = createBooking;
+const getBookingsByUser = async (req, res) => {
     try {
         const { userId } = req.body;
         if (!userId) {
@@ -102,8 +110,8 @@ export const getBookingsByUser = async (req, res) => {
             });
             return;
         }
-        const user = await UserModel.findOne({ _id: userId });
-        const bookings = await BookingModel.find({ user: userId })
+        const user = await user_1.default.findOne({ _id: userId });
+        const bookings = await booking_1.default.find({ user: userId })
             .populate("company", "name")
             .sort({ createdAt: -1 });
         const enrichedBookings = bookings.map((booking) => ({
@@ -127,10 +135,11 @@ export const getBookingsByUser = async (req, res) => {
         });
     }
 };
-export const getBookingsByCompany = async (req, res) => {
+exports.getBookingsByUser = getBookingsByUser;
+const getBookingsByCompany = async (req, res) => {
     try {
         const { companyId } = req.params;
-        const bookings = await BookingModel.find({ company: companyId })
+        const bookings = await booking_1.default.find({ company: companyId })
             .populate("user", "name")
             .sort({ createdAt: -1 });
         res.status(200).json({
@@ -146,7 +155,8 @@ export const getBookingsByCompany = async (req, res) => {
         });
     }
 };
-export const getBookingsByUserCompanies = async (req, res) => {
+exports.getBookingsByCompany = getBookingsByCompany;
+const getBookingsByUserCompanies = async (req, res) => {
     try {
         const { userId } = req.body;
         if (!userId) {
@@ -156,13 +166,13 @@ export const getBookingsByUserCompanies = async (req, res) => {
             });
             return;
         }
-        const userCompanies = await CompanyModel.find({ user: userId });
+        const userCompanies = await company_1.default.find({ user: userId });
         const companyIds = userCompanies.map((company) => company._id);
-        const bookings = await BookingModel.find({ company: { $in: companyIds } })
+        const bookings = await booking_1.default.find({ company: { $in: companyIds } })
             .populate("company", "name")
             .sort({ bookingDate: -1, startTime: -1 });
         const userIds = [...new Set(bookings.map((booking) => booking.user))];
-        const users = await UserModel.find({ _id: { $in: userIds } });
+        const users = await user_1.default.find({ _id: { $in: userIds } });
         const userMap = new Map(users.map((user) => [user._id.toString(), user]));
         const bookingsWithUsers = bookings.map((booking) => ({
             ...booking.toObject(),
@@ -185,7 +195,8 @@ export const getBookingsByUserCompanies = async (req, res) => {
         });
     }
 };
-export const updateBookingStatus = async (req, res) => {
+exports.getBookingsByUserCompanies = getBookingsByUserCompanies;
+const updateBookingStatus = async (req, res) => {
     try {
         const { bookingId } = req.params;
         const { status, userId } = req.body;
@@ -196,7 +207,7 @@ export const updateBookingStatus = async (req, res) => {
             });
             return;
         }
-        const booking = await BookingModel.findOneAndUpdate({ _id: bookingId, company: { $exists: true } }, { status }, { new: true });
+        const booking = await booking_1.default.findOneAndUpdate({ _id: bookingId, company: { $exists: true } }, { status }, { new: true });
         if (!booking) {
             res.status(404).json({
                 success: false,
@@ -217,4 +228,4 @@ export const updateBookingStatus = async (req, res) => {
         });
     }
 };
-//# sourceMappingURL=booking.js.map
+exports.updateBookingStatus = updateBookingStatus;

@@ -1,12 +1,17 @@
-import express from "express";
-import { createCompany, deleteCompany, getCompanies, getCompaniesByUser, getCompanyById, updateCompany, } from "../controllers/company";
-export const companyRouter = express.Router();
-companyRouter
-    .post("/create-company", createCompany)
-    .get("/get-companies", getCompanies)
-    .post("/get-companies-by-user", getCompaniesByUser)
-    .get("/get-company/:companyId", getCompanyById)
-    .post("/update-company/:companyId", updateCompany)
-    .post("/delete-company/:companyId", deleteCompany);
-export default companyRouter;
-//# sourceMappingURL=company.js.map
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.companyRouter = void 0;
+const express_1 = __importDefault(require("express"));
+const company_1 = require("../controllers/company");
+exports.companyRouter = express_1.default.Router();
+exports.companyRouter
+    .post("/create-company", company_1.createCompany)
+    .get("/get-companies", company_1.getCompanies)
+    .post("/get-companies-by-user", company_1.getCompaniesByUser)
+    .get("/get-company/:companyId", company_1.getCompanyById)
+    .post("/update-company/:companyId", company_1.updateCompany)
+    .post("/delete-company/:companyId", company_1.deleteCompany);
+exports.default = exports.companyRouter;

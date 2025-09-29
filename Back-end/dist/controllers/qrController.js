@@ -1,14 +1,22 @@
-import { v4 as uuidv4 } from "uuid";
-import WebSocket from "ws";
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.sessions = exports.scanQrCode = exports.createQrSession = void 0;
+const uuid_1 = require("uuid");
+const ws_1 = __importDefault(require("ws"));
 const sessions = new Map();
-export const createQrSession = (req, res) => {
-    const qrId = uuidv4();
+exports.sessions = sessions;
+const createQrSession = (req, res) => {
+    const qrId = (0, uuid_1.v4)();
     res.json({ qrId });
 };
-export const scanQrCode = (req, res) => {
+exports.createQrSession = createQrSession;
+const scanQrCode = (req, res) => {
     const qrId = req.params.qrId;
     const socket = sessions.get(qrId);
-    if (socket && socket.readyState === WebSocket.OPEN) {
+    if (socket && socket.readyState === ws_1.default.OPEN) {
         socket.send(JSON.stringify({ scanned: true }));
         sessions.delete(qrId);
         return res.send("QR scanned ✅");
@@ -17,5 +25,4 @@ export const scanQrCode = (req, res) => {
         return res.status(404).send("Invalid or expired QR");
     }
 };
-export { sessions };
-//# sourceMappingURL=qrController.js.map
+exports.scanQrCode = scanQrCode;

@@ -1,5 +1,11 @@
-import UserModel from "../model/user";
-export const createUser = async (req, res) => {
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.promoteToAdmin = exports.loginUser = exports.getUserById = exports.getCurrentUser = exports.getUsers = exports.createUser = void 0;
+const user_1 = __importDefault(require("../model/user"));
+const createUser = async (req, res) => {
     try {
         const { email, password, userName, firstName, lastName, photo } = req.body;
         if (!email || !password) {
@@ -9,14 +15,14 @@ export const createUser = async (req, res) => {
                 .end();
         }
         try {
-            const oldUser = await UserModel.find({ email: email });
+            const oldUser = await user_1.default.find({ email: email });
             if (oldUser.length > 0) {
                 return res
                     .status(405)
                     .send({ success: false, message: "user already exist" })
                     .end();
             }
-            const user = await UserModel.create({
+            const user = await user_1.default.create({
                 email,
                 password,
                 userName,
@@ -55,9 +61,10 @@ export const createUser = async (req, res) => {
             .end();
     }
 };
-export const getUsers = async (req, res) => {
+exports.createUser = createUser;
+const getUsers = async (req, res) => {
     try {
-        const users = await UserModel.find({})
+        const users = await user_1.default.find({})
             .select("-password")
             .sort({ createdAt: -1 });
         return res
@@ -79,9 +86,10 @@ export const getUsers = async (req, res) => {
             .end();
     }
 };
-export const getCurrentUser = async (req, res) => {
+exports.getUsers = getUsers;
+const getCurrentUser = async (req, res) => {
     try {
-        const user = await UserModel.findOne().select("-password");
+        const user = await user_1.default.findOne().select("-password");
         if (!user) {
             return res
                 .status(404)
@@ -94,7 +102,8 @@ export const getCurrentUser = async (req, res) => {
         return res.status(500).json({ success: false, message: "Server error" });
     }
 };
-export const getUserById = async (req, res) => {
+exports.getCurrentUser = getCurrentUser;
+const getUserById = async (req, res) => {
     try {
         const { userId } = req.params;
         if (!userId) {
@@ -102,7 +111,7 @@ export const getUserById = async (req, res) => {
                 .status(400)
                 .json({ success: false, message: "User ID is required" });
         }
-        const user = await UserModel.findById(userId).select("-password");
+        const user = await user_1.default.findById(userId).select("-password");
         if (!user) {
             return res
                 .status(404)
@@ -115,7 +124,8 @@ export const getUserById = async (req, res) => {
         return res.status(500).json({ success: false, message: "Server error" });
     }
 };
-export const loginUser = async (req, res) => {
+exports.getUserById = getUserById;
+const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
         if (!email || !password) {
@@ -123,7 +133,7 @@ export const loginUser = async (req, res) => {
                 .status(400)
                 .json({ success: false, message: "Email and password are required" });
         }
-        const user = await UserModel.findOne({ email });
+        const user = await user_1.default.findOne({ email });
         if (!user) {
             return res
                 .status(401)
@@ -148,7 +158,8 @@ export const loginUser = async (req, res) => {
         return res.status(500).json({ success: false, message: "Server error" });
     }
 };
-export const promoteToAdmin = async (req, res) => {
+exports.loginUser = loginUser;
+const promoteToAdmin = async (req, res) => {
     try {
         const { userId } = req.body;
         if (!userId) {
@@ -158,7 +169,7 @@ export const promoteToAdmin = async (req, res) => {
             });
             return;
         }
-        const user = await UserModel.findByIdAndUpdate(userId, { isAdmin: true }, { new: true });
+        const user = await user_1.default.findByIdAndUpdate(userId, { isAdmin: true }, { new: true });
         if (!user) {
             res.status(404).json({
                 success: false,
@@ -179,4 +190,4 @@ export const promoteToAdmin = async (req, res) => {
         res.status(500).json({ success: false, message: "Server error" });
     }
 };
-//# sourceMappingURL=user.js.map
+exports.promoteToAdmin = promoteToAdmin;

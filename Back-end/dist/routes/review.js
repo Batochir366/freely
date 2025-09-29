@@ -1,9 +1,15 @@
-import express from "express";
-import { createReview, deleteReview, getReviewsByCompany, getReviewsByUserCompanies, } from "../controllers/review";
-export const reviewsRouter = express.Router();
-reviewsRouter.post("/create-review", async (req, res) => {
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.reviewsRouter = void 0;
+const express_1 = __importDefault(require("express"));
+const review_1 = require("../controllers/review");
+exports.reviewsRouter = express_1.default.Router();
+exports.reviewsRouter.post("/create-review", async (req, res) => {
     try {
-        await createReview(req, res);
+        await (0, review_1.createReview)(req, res);
     }
     catch (error) {
         console.error(error);
@@ -13,9 +19,9 @@ reviewsRouter.post("/create-review", async (req, res) => {
         });
     }
 });
-reviewsRouter.get("/reviews/:companyId", async (req, res) => {
+exports.reviewsRouter.get("/reviews/:companyId", async (req, res) => {
     try {
-        await getReviewsByCompany(req, res);
+        await (0, review_1.getReviewsByCompany)(req, res);
     }
     catch (error) {
         console.error(error);
@@ -25,9 +31,9 @@ reviewsRouter.get("/reviews/:companyId", async (req, res) => {
         });
     }
 });
-reviewsRouter.post("/user-company-reviews", async (req, res) => {
+exports.reviewsRouter.post("/user-company-reviews", async (req, res) => {
     try {
-        await getReviewsByUserCompanies(req, res);
+        await (0, review_1.getReviewsByUserCompanies)(req, res);
     }
     catch (error) {
         console.error(error);
@@ -37,9 +43,9 @@ reviewsRouter.post("/user-company-reviews", async (req, res) => {
         });
     }
 });
-reviewsRouter.delete("/delete-review/:reviewId", async (req, res) => {
+exports.reviewsRouter.delete("/delete-review/:reviewId", async (req, res) => {
     try {
-        await deleteReview(req, res);
+        await (0, review_1.deleteReview)(req, res);
     }
     catch (error) {
         console.error(error);
@@ -49,5 +55,4 @@ reviewsRouter.delete("/delete-review/:reviewId", async (req, res) => {
         });
     }
 });
-export default reviewsRouter;
-//# sourceMappingURL=review.js.map
+exports.default = exports.reviewsRouter;

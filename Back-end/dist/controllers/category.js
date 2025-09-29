@@ -1,5 +1,11 @@
-import Category from "../model/category";
-export const createCategory = async (req, res) => {
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getCategories = exports.createCategory = void 0;
+const category_1 = __importDefault(require("../model/category"));
+const createCategory = async (req, res) => {
     try {
         const { name, group, icons } = req.body;
         if (!name || !group || !icons) {
@@ -9,7 +15,7 @@ export const createCategory = async (req, res) => {
                 .end();
             return;
         }
-        const existingCategory = await Category.findOne({ name, group });
+        const existingCategory = await category_1.default.findOne({ name, group });
         if (existingCategory) {
             res
                 .status(400)
@@ -20,7 +26,7 @@ export const createCategory = async (req, res) => {
                 .end();
             return;
         }
-        const category = await Category.create({
+        const category = await category_1.default.create({
             name,
             group,
             icons,
@@ -35,9 +41,10 @@ export const createCategory = async (req, res) => {
         res.status(500).json({ success: false, message: "Internal server error" });
     }
 };
-export const getCategories = async (req, res) => {
+exports.createCategory = createCategory;
+const getCategories = async (req, res) => {
     try {
-        const categories = await Category.find().sort({ name: 1 });
+        const categories = await category_1.default.find().sort({ name: 1 });
         res.status(200).json({
             success: true,
             data: categories,
@@ -48,4 +55,4 @@ export const getCategories = async (req, res) => {
         res.status(500).json({ success: false, message: "Internal server error" });
     }
 };
-//# sourceMappingURL=category.js.map
+exports.getCategories = getCategories;

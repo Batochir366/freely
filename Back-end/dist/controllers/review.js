@@ -1,17 +1,23 @@
-import ReviewModel from "../model/review";
-import CompanyModel from "../model/company";
-import UserModel from "../model/user";
-export const createReview = async (req, res) => {
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.deleteReview = exports.getReviewsByUserCompanies = exports.getReviewsByCompany = exports.createReview = void 0;
+const review_1 = __importDefault(require("../model/review"));
+const company_1 = __importDefault(require("../model/company"));
+const user_1 = __importDefault(require("../model/user"));
+const createReview = async (req, res) => {
     try {
         const { companyId, name, starCount, comment } = req.body;
-        const review = await ReviewModel.create({
+        const review = await review_1.default.create({
             company: companyId,
             user: "anonymous",
             name,
             starCount,
             comment,
         });
-        await CompanyModel.findByIdAndUpdate(companyId, { $push: { reviews: review._id } }, { new: true });
+        await company_1.default.findByIdAndUpdate(companyId, { $push: { reviews: review._id } }, { new: true });
         res.status(200).json({
             success: true,
             review,
@@ -25,14 +31,15 @@ export const createReview = async (req, res) => {
         });
     }
 };
-export const getReviewsByCompany = async (req, res) => {
+exports.createReview = createReview;
+const getReviewsByCompany = async (req, res) => {
     try {
         const { companyId } = req.params;
-        const reviews = await ReviewModel.find({ company: companyId }).sort({
+        const reviews = await review_1.default.find({ company: companyId }).sort({
             createdAt: -1,
         });
         const userIds = [...new Set(reviews.map((review) => review.user))].filter((id) => id !== "anonymous");
-        const users = await UserModel.find({ _id: { $in: userIds } });
+        const users = await user_1.default.find({ _id: { $in: userIds } });
         const userMap = new Map(users.map((user) => [user._id.toString(), user]));
         const reviewsWithUsers = reviews.map((review) => ({
             ...review.toObject(),
@@ -56,16 +63,17 @@ export const getReviewsByCompany = async (req, res) => {
         });
     }
 };
-export const getReviewsByUserCompanies = async (req, res) => {
+exports.getReviewsByCompany = getReviewsByCompany;
+const getReviewsByUserCompanies = async (req, res) => {
     try {
         const userId = req.body.userId || req.userId || "default-user";
-        const userCompanies = await CompanyModel.find({ user: userId });
+        const userCompanies = await company_1.default.find({ user: userId });
         const companyIds = userCompanies.map((company) => company._id);
-        const reviews = await ReviewModel.find({
+        const reviews = await review_1.default.find({
             company: { $in: companyIds },
         }).populate("company", "name");
         const userIds = [...new Set(reviews.map((review) => review.user))];
-        const users = await UserModel.find({ _id: { $in: userIds } });
+        const users = await user_1.default.find({ _id: { $in: userIds } });
         const userMap = new Map(users.map((user) => [user._id.toString(), user]));
         const reviewsWithUsers = reviews.map((review) => ({
             ...review.toObject(),
@@ -87,10 +95,11 @@ export const getReviewsByUserCompanies = async (req, res) => {
         });
     }
 };
-export const deleteReview = async (req, res) => {
+exports.getReviewsByUserCompanies = getReviewsByUserCompanies;
+const deleteReview = async (req, res) => {
     try {
         const { reviewId } = req.params;
-        const review = await ReviewModel.findByIdAndDelete(reviewId);
+        const review = await review_1.default.findByIdAndDelete(reviewId);
         if (!review) {
             res.status(404).json({
                 success: false,
@@ -111,4 +120,4 @@ export const deleteReview = async (req, res) => {
         });
     }
 };
-//# sourceMappingURL=review.js.map
+exports.deleteReview = deleteReview;
