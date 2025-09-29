@@ -8,6 +8,8 @@ import reviewsRouter from "./routes/review";
 import bookingRouter from "./routes/booking";
 import categoryRouter from "./routes/category";
 import { qrRoutes } from "./routes/qrRoutes";
+import { initWebSocket } from "./websocket";
+import { createServer } from "http";
 
 const app = express();
 
@@ -38,6 +40,10 @@ app.get("/health", (req: any, res: any) => {
 });
 
 // For local development, start the server
+const server = createServer(app);
+
+// Init WebSocket server with HTTP server
+initWebSocket(server);
 
 app.listen(port, () => {
   console.log(`Server running at PORT: http://localhost:${port}`);
