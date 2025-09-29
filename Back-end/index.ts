@@ -13,7 +13,7 @@ const app = express();
 
 configDotenv();
 
-const port = process.env.PORT || 8000;
+const port = 8000;
 
 // Initialize MongoDB connection
 connectMongoDB();
@@ -38,8 +38,7 @@ app.get("/health", (req: any, res: any) => {
 });
 
 // For local development, start the server
-if (process.env.NODE_ENV !== "production") {
-  app.listen(port, () => {
-    console.log(`Server running at PORT: http://localhost:${port}`);
-  });
-}
+
+app.listen(port, () => {
+  console.log(`Server running at PORT: http://localhost:${port}`);
+});
