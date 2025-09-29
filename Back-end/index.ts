@@ -10,7 +10,6 @@ import categoryRouter from "./routes/category";
 import { qrRoutes } from "./routes/qrRoutes";
 
 const app = express();
-const publicRouter = express.Router();
 
 configDotenv();
 
@@ -23,11 +22,10 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/category", categoryRouter);
-app.get("/pp", (req: any, res: any) => {
+app.get("/", (req: any, res: any) => {
   res.send("hello world");
 });
 
-app.use(publicRouter);
 app.use("/user", usersRouter);
 app.use("/company", companyRouter);
 app.use("/review", reviewsRouter);
@@ -38,9 +36,6 @@ app.use("/qr", qrRoutes);
 app.get("/health", (req: any, res: any) => {
   res.status(200).json({ status: "OK", timestamp: new Date().toISOString() });
 });
-
-// For serverless deployment, export the app
-module.exports = app;
 
 // For local development, start the server
 if (process.env.NODE_ENV !== "production") {
