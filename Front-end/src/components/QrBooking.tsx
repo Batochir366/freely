@@ -16,7 +16,7 @@ export const QrBooking = () => {
         const qrIdFromServer = res.data.qrId;
         setQrId(qrIdFromServer);
 
-        const socket = new WebSocket("wss://teamproject-mongodb.onrender.com");
+        const socket = new WebSocket("wss://freely-backend-lztj.onrender.com");
 
         socket.onopen = () => {
           socket.send(JSON.stringify({ qrId: qrIdFromServer }));
@@ -45,7 +45,7 @@ export const QrBooking = () => {
   }, [setScanned]);
 
   const qrUrl = qrId
-    ? `https://teamproject-mongodb.onrender.com/qr/scan/${qrId}`
+    ? `https://freely-backend-lztj.onrender.com/qr/scan/${qrId}`
     : "";
 
   return (
