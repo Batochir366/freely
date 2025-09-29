@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { BookingCard } from "./booking-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { GrCurrency } from "react-icons/gr";
@@ -8,6 +8,7 @@ import { GrCurrency } from "react-icons/gr";
 import { Calendar, TrendingUp, Users } from "lucide-react";
 import { motion } from "framer-motion";
 import axiosInstance from "@/utils/axios";
+import { useAuth } from "@/app/context/AuthContext";
 
 interface Booking {
   _id: string;
@@ -26,21 +27,24 @@ interface Booking {
 }
 
 export function BookingDashboard() {
+  const { user } = useAuth();
   const [bookings, setBookings] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const fetchBookings = async () => {
+  const fetchBookings = useCallback(async () => {
     setIsLoading(true);
     try {
-      const res = await axiosInstance.get("/booking/user-bookings");
+      const res = await axiosInstance.post("/booking/user-bookings", {
+        userId: user?._id,
+      });
       setBookings(res.data.bookings);
       setIsLoading(false);
     } catch (error) {
       console.log(error, "failed to fetch data");
     }
-  };
+  }, [user?._id]);
   useEffect(() => {
     fetchBookings();
-  }, []);
+  }, [fetchBookings]);
 
   if (isLoading) {
     return (
@@ -85,7 +89,7 @@ export function BookingDashboard() {
         <h1 className="text-4xl relative text-white font-bold text-shadow-2xl  tracking-tight">
           Booking Dashboard
         </h1>
-        <p className="text-muted-foreground  ">
+        <p className="text-white/70">
           Manage your bookings with style and efficiency
         </p>
       </motion.div>
@@ -97,45 +101,55 @@ export function BookingDashboard() {
         transition={{ delay: 0.1 }}
         className="grid grid-cols-1 md:grid-cols-4 gap-4"
       >
-        <Card className="bg-gradient-to-r relative from-slate-300 to-purple-200">
+        <Card className="bg-white/10 backdrop-blur-sm border-white/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+            <CardTitle className="text-sm font-medium text-white">
               Total Bookings
             </CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <Calendar className="h-4 w-4 text-white/70" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{bookings.length}</div>
+            <div className="text-2xl font-bold text-white">
+              {bookings.length}
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-r relative from-slate-200 to-red-200">
+        <Card className="bg-white/10 backdrop-blur-sm border-white/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Booked</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-white">
+              Booked
+            </CardTitle>
+            <Users className="h-4 w-4 text-white/70" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.booked}</div>
+            <div className="text-2xl font-bold text-white">{stats.booked}</div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-bl relative from-green-400 to-blue-500 ">
+        <Card className="bg-white/10 backdrop-blur-sm border-white/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Canceled</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-white">
+              Canceled
+            </CardTitle>
+            <TrendingUp className="h-4 w-4 text-white/70" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold ">{stats.cancelled}</div>
+            <div className="text-2xl font-bold text-white">
+              {stats.cancelled}
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-b relative from-blue-400 to-slate-50">
+        <Card className="bg-white/10 backdrop-blur-sm border-white/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Revenue</CardTitle>
-            <GrCurrency className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-white">
+              Revenue
+            </CardTitle>
+            <GrCurrency className="h-4 w-4 text-white/70" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold text-white">
               {stats.revenue.toLocaleString()}
 
               <span className="text-2xl font-bold">₮ </span>

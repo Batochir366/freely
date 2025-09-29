@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import ReviewModel from "../model/review";
 import CompanyModel from "../model/company";
 import UserModel from "../model/user"; // Import UserModel
-import { RequestWithUserId } from "../middleware/checkClerkToken";
+// Authentication middleware removed
 
 export const createReview = async (
   req: Request,
@@ -10,19 +10,11 @@ export const createReview = async (
 ): Promise<void> => {
   try {
     const { companyId, name, starCount, comment } = req.body;
-    const userId = (req as any).userId;
 
-    if (!userId) {
-      res.status(401).json({
-        success: false,
-        message: "User ID is required",
-      });
-      return;
-    }
-
+    // Create review without requiring user authentication
     const review = await ReviewModel.create({
       company: companyId,
-      user: userId.toString(),
+      user: "anonymous", // Use anonymous for non-authenticated reviews
       name,
       starCount,
       comment,
@@ -54,13 +46,31 @@ export const getReviewsByCompany = async (
   try {
     const { companyId } = req.params;
 
-    const reviews = await ReviewModel.find({ company: companyId })
-      .populate("user", "name")
-      .sort({ createdAt: -1 });
+    const reviews = await ReviewModel.find({ company: companyId }).sort({
+      createdAt: -1,
+    });
+
+    // Get user details for each review (handle anonymous reviews)
+    const userIds = [...new Set(reviews.map((review) => review.user))].filter(
+      (id) => id !== "anonymous"
+    );
+    const users = await UserModel.find({ _id: { $in: userIds } });
+    const userMap = new Map(users.map((user) => [user._id.toString(), user]));
+
+    const reviewsWithUsers = reviews.map((review) => ({
+      ...review.toObject(),
+      user:
+        review.user === "anonymous"
+          ? { userName: review.name || "Anonymous", photo: null }
+          : userMap.get(review.user) || {
+              userName: "Unknown User",
+              photo: null,
+            },
+    }));
 
     res.status(200).json({
       success: true,
-      reviews,
+      reviews: reviewsWithUsers,
     });
   } catch (error) {
     console.error(error);
@@ -72,11 +82,11 @@ export const getReviewsByCompany = async (
 };
 
 export const getReviewsByUserCompanies = async (
-  req: RequestWithUserId,
+  req: Request,
   res: Response
 ): Promise<void> => {
   try {
-    const userId = req.userId;
+    const userId = req.body.userId || (req as any).userId || "default-user";
 
     const userCompanies = await CompanyModel.find({ user: userId });
     const companyIds = userCompanies.map((company) => company._id);
@@ -87,8 +97,8 @@ export const getReviewsByUserCompanies = async (
 
     const userIds = [...new Set(reviews.map((review) => review.user))];
 
-    const users = await UserModel.find({ clerkId: { $in: userIds } });
-    const userMap = new Map(users.map((user) => [user.clerkId, user]));
+    const users = await UserModel.find({ _id: { $in: userIds } });
+    const userMap = new Map(users.map((user) => [user._id.toString(), user]));
 
     const reviewsWithUsers = reviews.map((review) => ({
       ...review.toObject(),

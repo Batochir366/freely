@@ -1,27 +1,15 @@
 "use client";
-import { ArrowRight, ChevronDown, Menu, X } from "lucide-react";
+import { ArrowRight, Menu, X } from "lucide-react";
 import type React from "react";
 
-import { SignedIn, useAuth, UserButton, useUser } from "@clerk/nextjs";
-import Image from "next/image";
 import LogoIconMain from "./LogoIcon";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import axiosInstance from "@/utils/axios";
+import { useState } from "react";
+import { useAuth } from "@/app/context/AuthContext";
 
 const twkLausanneFont = {
   fontFamily: '"TWK Lausanne 400", "TWK Lausanne 400 Placeholder", sans-serif',
 } as React.CSSProperties;
-
-type User = {
-  clerkId: string;
-  email: string;
-  userName: string;
-  firstName: string;
-  lastName: string;
-  photo: string;
-  isAdmin: boolean;
-};
 
 function NavLink({
   href,
@@ -47,40 +35,22 @@ function NavLink({
 }
 
 export default function NavBar() {
-  const { isSignedIn } = useAuth();
-  const [signedUser, setSignedUser] = useState<User | null>(null);
+  const { user, isAuthenticated, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const { user, isLoaded } = useUser();
   const router = useRouter();
   const pathName = usePathname();
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      if (!isSignedIn) return;
-
-      try {
-        const res = await axiosInstance.get("/user/get-current-user");
-        setSignedUser(res.data.user);
-      } catch (error) {
-        console.error("Failed to fetch user:", error);
-      }
-    };
-
-    fetchUser();
-  }, [isSignedIn]);
-
   // Close mobile menu when clicking outside or on navigation
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 768) {
-        setIsMobileMenuOpen(false);
-      }
-    };
+  const handleResize = () => {
+    if (window.innerWidth >= 768) {
+      setIsMobileMenuOpen(false);
+    }
+  };
 
+  if (typeof window !== "undefined") {
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }
 
   const closeMobileMenu = () => {
     setIsMobileMenuOpen(false);
@@ -137,7 +107,7 @@ export default function NavBar() {
               </span>
             </NavLink>
 
-            {signedUser?.isAdmin == true ? (
+            {user?.isAdmin == true ? (
               <NavLink href="/admin/dashboard">
                 <span
                   className={`text-[15px] text-[rgba(99,100,117)] hover:text-white`}
@@ -151,53 +121,28 @@ export default function NavBar() {
 
           {/* Desktop User Section */}
           <div className="hidden md:flex items-center gap-4">
-            {user ? (
-              <SignedIn>
-                {isLoaded && user && (
-                  <div
-                    className="flex gap-4 items-center cursor-pointer"
-                    onClick={() => {
-                      const userButton = document.querySelector(
-                        ".cl-userButtonTrigger"
-                      );
-                      if (userButton) (userButton as HTMLElement).click();
-                    }}
-                  >
-                    <UserButton
-                      appearance={{
-                        elements: {
-                          userButtonTrigger: { display: "none" },
-                          popoverContent: {
-                            transform: "translateX(-200px)",
-                            marginTop: "8px",
-                          },
-                        },
-                      }}
-                    />
-                    <Image
-                      src={user.imageUrl || "/placeholder.svg"}
-                      alt={user.username || user.firstName || "User"}
-                      width={32}
-                      height={32}
-                      className="rounded-full"
-                    />
-                    <p
-                      className="font-medium text-[#B8CFCE] hidden lg:block"
-                      style={twkLausanneFont}
-                    >
-                      {user.username || user.firstName || "User"}
-                    </p>
-                    <ChevronDown className="size-[16px] text-[#B8CFCE]" />
-                  </div>
-                )}
-              </SignedIn>
+            {isAuthenticated && user ? (
+              <div className="flex gap-4 items-center">
+                <p
+                  className="font-medium text-[#B8CFCE] hidden lg:block"
+                  style={twkLausanneFont}
+                >
+                  {user.userName || user.firstName || "User"}
+                </p>
+                <button
+                  onClick={logout}
+                  className="text-[#B8CFCE] hover:text-white transition-colors text-sm"
+                >
+                  Logout
+                </button>
+              </div>
             ) : (
               <div className="flex items-center gap-[10px] hover:opacity-60 hover:cursor-pointer">
                 <p
                   className={`text-[#B8CFCE] font-medium`}
                   style={twkLausanneFont}
                   onClick={() => {
-                    router.push("/sign-in");
+                    router.push("/sign-up");
                   }}
                 >
                   Try it free
@@ -207,44 +152,8 @@ export default function NavBar() {
             )}
           </div>
 
-          {/* Mobile Menu Button & User */}
+          {/* Mobile Menu Button */}
           <div className="flex md:hidden items-center gap-3">
-            {/* Mobile User Avatar */}
-            {user && (
-              <SignedIn>
-                {isLoaded && user && (
-                  <div
-                    className="flex items-center cursor-pointer"
-                    onClick={() => {
-                      const userButton = document.querySelector(
-                        ".cl-userButtonTrigger"
-                      );
-                      if (userButton) (userButton as HTMLElement).click();
-                    }}
-                  >
-                    <UserButton
-                      appearance={{
-                        elements: {
-                          userButtonTrigger: { display: "none" },
-                          popoverContent: {
-                            transform: "translateX(-150px)",
-                            marginTop: "8px",
-                          },
-                        },
-                      }}
-                    />
-                    <Image
-                      src={user.imageUrl || "/placeholder.svg"}
-                      alt={user.username || user.firstName || "User"}
-                      width={28}
-                      height={28}
-                      className="rounded-full"
-                    />
-                  </div>
-                )}
-              </SignedIn>
-            )}
-
             {/* Hamburger Menu Button */}
             <button
               onClick={toggleMobileMenu}
@@ -305,7 +214,7 @@ export default function NavBar() {
               </span>
             </NavLink>
 
-            {signedUser?.isAdmin == false ? (
+            {user?.isAdmin == true ? (
               <NavLink href="/admin/dashboard" onClick={closeMobileMenu}>
                 <span
                   className={`text-[16px] text-[rgba(99,100,117)] hover:text-white`}
@@ -319,31 +228,31 @@ export default function NavBar() {
 
           {/* Mobile User Section */}
           <div className="pt-4 border-t border-[rgba(255,255,255,0.1)]">
-            {user ? (
-              <SignedIn>
-                {isLoaded && user && (
-                  <div className="flex items-center gap-3 py-2">
-                    <Image
-                      src={user.imageUrl || "/placeholder.svg"}
-                      alt={user.username || user.firstName || "User"}
-                      width={32}
-                      height={32}
-                      className="rounded-full"
-                    />
-                    <p
-                      className="font-medium text-[#B8CFCE]"
-                      style={twkLausanneFont}
-                    >
-                      {user.username || user.firstName || "User"}
-                    </p>
-                  </div>
-                )}
-              </SignedIn>
+            {isAuthenticated && user ? (
+              <div className="flex items-center justify-between py-2">
+                <div className="flex items-center gap-3">
+                  <p
+                    className="font-medium text-[#B8CFCE]"
+                    style={twkLausanneFont}
+                  >
+                    {user.userName || user.firstName || "User"}
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    logout();
+                    closeMobileMenu();
+                  }}
+                  className="text-[#B8CFCE] hover:text-white transition-colors text-sm"
+                >
+                  Logout
+                </button>
+              </div>
             ) : (
               <div
                 className="flex items-center gap-[10px] hover:opacity-60 hover:cursor-pointer py-2"
                 onClick={() => {
-                  router.push("/sign-in");
+                  router.push("/sign-up");
                   closeMobileMenu();
                 }}
               >

@@ -1,16 +1,21 @@
-import { createUser, getCurrentUser, getUsers } from "../controllers/user";
-import { verifyClerkToken } from "../middleware/checkClerkToken";
+import {
+  createUser,
+  getCurrentUser,
+  getUsers,
+  getUserById,
+  loginUser,
+  promoteToAdmin,
+} from "../controllers/user";
 import express, { Request, Response } from "express";
-
-interface RequestWithUserId extends Request {
-  userId: string;
-}
 
 export const usersRouter = express.Router();
 
 usersRouter
-  .post("/create-user", createUser)
-  .get("/get-users", getUsers)
-  .get("/get-current-user", verifyClerkToken, getCurrentUser as any);
+  .post("/create-user", createUser as any)
+  .post("/login", loginUser as any)
+  .get("/get-users", getUsers as any)
+  .get("/get-current-user", getCurrentUser as any)
+  .get("/get-user/:userId", getUserById as any)
+  .post("/promote-to-admin", promoteToAdmin as any);
 
 export default usersRouter;

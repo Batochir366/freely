@@ -1,9 +1,9 @@
-import { WebSocketServer } from "ws";
+import WebSocket from "ws";
 import { Server } from "http";
-import { sessions } from "./controllers/qrController";
+import { sessions } from "./controllers/qrController.js";
 
 export const initWebSocket = (server: Server) => {
-  const wss = new WebSocketServer({ server });
+  const wss = new WebSocket.Server({ server });
 
   wss.on("connection", (ws) => {
     ws.on("message", (message) => {

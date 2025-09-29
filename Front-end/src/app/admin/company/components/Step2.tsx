@@ -13,48 +13,10 @@ type Category = {
   icons: string;
 };
 
-// type Step2Props = {
-//   control: Control<typeof step2formSchema>;
-//   name: string;
-// };
-
 interface Step2Props {
   control: Control<z.infer<typeof step2formSchema>>;
   name: keyof z.infer<typeof step2formSchema>;
 }
-
-// const categoryIconsData: Category[] = [
-//   { id: 1, name: "Archery", icon: "🏹" },
-//   { id: 3, name: "Badminton", icon: "🏸" },
-//   { id: 4, name: "Baseball", icon: "⚾" },
-//   { id: 5, name: "Basketball", icon: "🏀" },
-//   { id: 6, name: "Boxing", icon: "🥊" },
-//   { id: 9, name: "Cycling", icon: "🚴" },
-//   { id: 13, name: "Football", icon: "⚽" },
-//   { id: 14, name: "Golf", icon: "🏌️" },
-//   { id: 15, name: "Gymnastics", icon: "🤸" },
-//   { id: 18, name: "Ice Hockey", icon: "🏒" },
-//   { id: 19, name: "Judo", icon: "🥋" },
-//   { id: 20, name: "Karate", icon: "🥋" },
-//   { id: 28, name: "Shooting", icon: "🔫" },
-//   { id: 35, name: "Swimming pool", icon: "🏊" },
-//   { id: 38, name: "Tennis", icon: "🎾" },
-//   { id: 41, name: "Volleyball", icon: "🏐" },
-//   { id: 44, name: "Wrestling", icon: "🤼" },
-//   { id: 47, name: "Art & Craft", icon: "🎨" },
-//   { id: 48, name: "Billiards", icon: "🎱" },
-//   { id: 49, name: "Board Games", icon: "🎲" },
-//   { id: 50, name: "Bowling", icon: "🎳" },
-//   { id: 53, name: "Cooking Classes", icon: "👨‍🍳" },
-//   { id: 54, name: "Dance", icon: "💃" },
-//   { id: 56, name: "Fishing", icon: "🎣" },
-//   { id: 58, name: "Hiking", icon: "🥾" },
-//   { id: 61, name: "Karaoke", icon: "🎤" },
-//   { id: 64, name: "Movie Night", icon: "🎬" },
-//   { id: 70, name: "Roller Skating", icon: "🛼" },
-//   { id: 82, name: "PC Video Games", icon: "🎮" },
-//   { id: 86, name: "Zip Lining", icon: "🌲" },
-// ];
 
 export const Step2 = ({ control, name }: Step2Props) => {
   const [search, setSearch] = useState("");

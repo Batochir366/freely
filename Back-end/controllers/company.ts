@@ -3,15 +3,10 @@ import { Request, Response } from "express";
 import categoryModel from "../model/category";
 import mongoose from "mongoose";
 import CompanyModel from "../model/company";
-interface RequestWithUserId extends Request {
-  userId: string;
-}
-
 export const createCompany = async (
-  req: RequestWithUserId,
+  req: Request,
   res: Response
 ): Promise<any> => {
-  const userId = req.userId;
   const {
     name,
     description,
@@ -22,6 +17,7 @@ export const createCompany = async (
     images,
     companyLogo,
     pricing,
+    userId,
   } = req.body;
 
   if (!userId) {
@@ -30,6 +26,10 @@ export const createCompany = async (
       .json({ success: false, message: "userId is required" })
       .end();
   }
+
+  // Convert userId to ObjectId if it's a string
+  const userObjectId =
+    typeof userId === "string" ? new mongoose.Types.ObjectId(userId) : userId;
 
   try {
     const validCategories = await categoryModel.find({
@@ -45,7 +45,7 @@ export const createCompany = async (
         .end();
     }
     const newCompany = await CompanyModel.create({
-      user: userId,
+      user: userObjectId,
       name,
       description,
       location,
@@ -69,7 +69,7 @@ interface GetCompaniesQuery {
 }
 
 export const getCompanies = async (
-  req: Request<unknown, unknown, unknown, GetCompaniesQuery>,
+  req: Request,
   res: Response
 ): Promise<Response> => {
   const { q, categories } = req.query;
@@ -79,7 +79,7 @@ export const getCompanies = async (
 
     // Text search
     if (q) {
-      const searchRegex = new RegExp(q, "i");
+      const searchRegex = new RegExp(q as string, "i");
       filter.$or = [
         { name: searchRegex },
         { phoneNumber: searchRegex },
@@ -97,7 +97,7 @@ export const getCompanies = async (
         : [categories];
 
       const categoryObjectIds = categoryArray.map(
-        (id) => new mongoose.Types.ObjectId(id)
+        (id) => new mongoose.Types.ObjectId(id as string)
       );
 
       filter.category = { $in: categoryObjectIds };
@@ -116,12 +116,23 @@ export const getCompanies = async (
 };
 
 export const getCompaniesByUser = async (
-  req: RequestWithUserId,
+  req: Request,
   res: Response
 ): Promise<any> => {
-  const userId = req.userId;
+  const { userId } = req.body;
+
+  if (!userId) {
+    return res
+      .status(400)
+      .json({ success: false, message: "userId is required" });
+  }
+
   try {
-    const companies = await CompanyModel.find({ user: userId }).sort({
+    // Convert userId to ObjectId if it's a string
+    const userObjectId =
+      typeof userId === "string" ? new mongoose.Types.ObjectId(userId) : userId;
+
+    const companies = await CompanyModel.find({ user: userObjectId }).sort({
       createdAt: -1,
     });
     return res.status(200).json({ success: true, companies }).end();
@@ -132,14 +143,25 @@ export const getCompaniesByUser = async (
 };
 
 export const updateCompany = async (
-  req: RequestWithUserId,
+  req: Request,
   res: Response
 ): Promise<any> => {
-  const userId = req.userId;
+  const { userId } = req.body;
   const companyId = req.params.companyId;
+
+  if (!userId) {
+    return res
+      .status(400)
+      .json({ success: false, message: "userId is required" });
+  }
+
   try {
+    // Convert userId to ObjectId if it's a string
+    const userObjectId =
+      typeof userId === "string" ? new mongoose.Types.ObjectId(userId) : userId;
+
     const company = await CompanyModel.findOneAndUpdate(
-      { user: userId, _id: companyId },
+      { user: userObjectId, _id: companyId },
       req.body,
       { new: true }
     );
@@ -177,14 +199,25 @@ export const getCompanyById = async (
 };
 
 export const deleteCompany = async (
-  req: RequestWithUserId,
+  req: Request,
   res: Response
 ): Promise<any> => {
-  const userId = req.userId;
+  const { userId } = req.body;
   const companyId = req.params.companyId;
+
+  if (!userId) {
+    return res
+      .status(400)
+      .json({ success: false, message: "userId is required" });
+  }
+
   try {
+    // Convert userId to ObjectId if it's a string
+    const userObjectId =
+      typeof userId === "string" ? new mongoose.Types.ObjectId(userId) : userId;
+
     const company = await CompanyModel.findOneAndDelete({
-      user: userId,
+      user: userObjectId,
       _id: companyId,
     });
     if (!company) {

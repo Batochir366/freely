@@ -1,6 +1,5 @@
 "use client";
 
-import { BookingData } from "@/lib/booking-data";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
@@ -23,7 +22,7 @@ interface BookingCardProps {
 export const BookingCard = ({ booking }: { booking: BookingCardProps }) => {
   console.log(booking, "booking");
 
-  const getStatusColor = (status: BookingData["status"]) => {
+  const getStatusColor = (status: "booked" | "cancelled") => {
     switch (status) {
       case "booked":
         return "bg-orange-200 text-amber-800 border-amber-200";
@@ -35,7 +34,7 @@ export const BookingCard = ({ booking }: { booking: BookingCardProps }) => {
     }
   };
 
-  const getStatusIcon = (status: BookingData["status"]) => {
+  const getStatusIcon = (status: "booked" | "cancelled") => {
     switch (status) {
       case "booked":
         return <Clock4 className="w-3 h-3" />;

@@ -24,6 +24,7 @@ import {
 import { useScan } from "@/app/context/ScanContext";
 import { toast, Toaster } from "sonner";
 import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
+import { useAuth } from "@/app/context/AuthContext";
 interface BackendBooking {
   _id: string;
   bookingDate: string;
@@ -41,6 +42,7 @@ interface Booking {
 }
 
 export const BookingDate = ({ price }: { price: number | undefined }) => {
+  const { user } = useAuth();
   const [currentStartDate, setCurrentStartDate] = React.useState<Date>(
     startOfDay(new Date())
   );
@@ -213,6 +215,7 @@ export const BookingDate = ({ price }: { price: number | undefined }) => {
               startTime,
               endTime,
               price: booking.price,
+              userId: user?._id,
             });
           } catch (error) {
             console.error("Error creating booking:", error);
@@ -225,7 +228,7 @@ export const BookingDate = ({ price }: { price: number | undefined }) => {
     };
     fetchBooking();
     toast("time booked successfully");
-  }, [bookings, params.id]);
+  }, [bookings, params.id, user?._id]);
 
   const fetchBookingData = useCallback(() => {
     const fetchBooking = async () => {

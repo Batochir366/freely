@@ -16,7 +16,7 @@ const locationSchema = new mongoose.Schema({
 });
 
 const companySchema = new mongoose.Schema({
-  user: { type: String, required: true },
+  user: { type: Schema.Types.ObjectId, ref: "User", required: true },
   name: { type: String, required: true },
   description: { type: String },
   location: [locationSchema],

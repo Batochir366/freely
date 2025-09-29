@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -40,15 +40,20 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import AdminBookingForm from "@/components/admin-booking-form";
+import { useAuth } from "@/app/context/AuthContext";
 
 interface Booking {
   _id: string;
-  user: string;
+  user: {
+    _id: string;
+    userName: string;
+    firstName: string;
+    lastName: string;
+  };
   company: {
     _id: string;
     name: string;
   };
-
   bookingDate: string;
   startTime: string;
   endTime: string;
@@ -78,27 +83,30 @@ interface Company {
 }
 
 export default function AdminDashboard() {
+  const { user } = useAuth();
   const [selectedCompany, setSelectedCompany] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [bookingDataBE, setBookingDataBE] = useState<Booking[]>([]);
   const [companies, setCompanies] = useState<Company[]>([]);
 
-  const fetchBookingDataBe = async () => {
+  const fetchBookingDataBe = useCallback(async () => {
     try {
-      const response = await axiosInstance.get(
-        "/booking/user-company-bookings"
+      const response = await axiosInstance.post(
+        "/booking/user-company-bookings",
+        { userId: user?._id }
       );
       setBookingDataBE(response.data.bookings);
     } catch (error) {
       console.log(error);
     }
-  };
+  }, [user?._id]);
 
-  const fetchCompanies = async () => {
+  const fetchCompanies = useCallback(async () => {
     try {
-      const response = await axiosInstance.get(
-        "/company/get-companies-by-user"
+      const response = await axiosInstance.post(
+        "/company/get-companies-by-user",
+        { userId: user?._id }
       );
       if (response.data?.success && response.data?.companies) {
         setCompanies(response.data.companies);
@@ -106,12 +114,12 @@ export default function AdminDashboard() {
     } catch (error) {
       console.error("Error fetching companies:", error);
     }
-  };
+  }, [user?._id]);
 
   useEffect(() => {
     fetchBookingDataBe();
     fetchCompanies();
-  }, []);
+  }, [fetchBookingDataBe, fetchCompanies]);
 
   const filteredBookings = bookingDataBE.filter((booking) => {
     const matchesCompany =
@@ -121,7 +129,9 @@ export default function AdminDashboard() {
     const matchesSearch =
       searchTerm === "" ||
       booking.company.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      booking.user.toLowerCase().includes(searchTerm.toLowerCase());
+      booking.user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      booking.user.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      booking.user.userName.toLowerCase().includes(searchTerm.toLowerCase());
 
     return matchesCompany && matchesStatus && matchesSearch;
   });
@@ -149,8 +159,9 @@ export default function AdminDashboard() {
         )
       );
 
-      await axiosInstance.put(`/booking/update-status/${bookingId}`, {
+      await axiosInstance.post(`/booking/update-status/${bookingId}`, {
         status: newStatus,
+        userId: user?._id,
       });
 
       await fetchBookingDataBe();
@@ -162,11 +173,8 @@ export default function AdminDashboard() {
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("mn-MN", {
-      style: "currency",
-      currency: "MNT",
-      minimumFractionDigits: 0,
-    }).format(amount);
+    // Use a simple format to avoid hydration issues
+    return `₮${amount.toLocaleString()}`;
   };
 
   const formatDate = (dateString: string) => {
@@ -337,9 +345,13 @@ export default function AdminDashboard() {
                     Add booking
                   </div>
                 </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AdminBookingForm />
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogContent className="max-h-[90vh] overflow-y-auto">
+                  <div className="max-h-[80vh] overflow-y-auto">
+                    <AdminBookingForm />
+                  </div>
+                  <div className="sticky bottom-0 bg-background pt-4 border-t">
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  </div>
                 </AlertDialogContent>
               </AlertDialog>
             </div>
@@ -348,8 +360,8 @@ export default function AdminDashboard() {
             </CardDescription>
           </CardHeader>
 
-          <CardContent>
-            <div className="rounded-md border">
+          <CardContent className="pb-0 md:pb-6">
+            <div className="rounded-md border pb-4 md:pb-0">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -382,8 +394,8 @@ export default function AdminDashboard() {
                         <TableCell>
                           {booking.startTime} - {booking.endTime}
                         </TableCell>
-                        <TableCell className="font-mono text-sm">
-                          {booking.user}
+                        <TableCell className="font-medium">
+                          {booking.user.firstName} {booking.user.lastName}
                         </TableCell>
                         <TableCell>
                           {formatCurrency(Number.parseInt(booking.price))}

@@ -7,54 +7,38 @@ import {
   updateBookingStatus,
   getBookingsByUserCompanies,
 } from "../controllers/booking";
-import { verifyClerkToken } from "../middleware/checkClerkToken";
-
-interface RequestWithUserId extends Request {
-  userId: string;
-}
 
 export const bookingRouter = express.Router();
 
-bookingRouter.post(
-  "/create-booking",
-  verifyClerkToken,
-  async (req: Request, res: Response) => {
-    try {
-      const reqWithUserId = req as RequestWithUserId;
-      await createBooking(reqWithUserId, res);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({
-        success: false,
-        message: "Internal server error",
-      });
-    }
+bookingRouter.post("/create-booking", async (req: Request, res: Response) => {
+  try {
+    await createBooking(req, res);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
   }
-);
+});
 
-bookingRouter.get(
-  "/user-bookings",
-  verifyClerkToken,
-  async (req: Request, res: Response) => {
-    try {
-      const reqWithUserId = req as RequestWithUserId;
-      await getBookingsByUser(reqWithUserId, res);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({
-        success: false,
-        message: "Internal server error",
-      });
-    }
+bookingRouter.post("/user-bookings", async (req: Request, res: Response) => {
+  try {
+    await getBookingsByUser(req, res);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
   }
-);
+});
 
 bookingRouter.get(
   "/company-bookings/:companyId",
   async (req: Request, res: Response) => {
     try {
-      const reqWithUserId = req as RequestWithUserId;
-      await getBookingsByCompany(reqWithUserId, res);
+      await getBookingsByCompany(req, res);
     } catch (error) {
       console.error(error);
       res.status(500).json({
@@ -65,13 +49,11 @@ bookingRouter.get(
   }
 );
 
-bookingRouter.put(
+bookingRouter.post(
   "/update-status/:bookingId",
-  verifyClerkToken,
   async (req: Request, res: Response) => {
     try {
-      const reqWithUserId = req as RequestWithUserId;
-      await updateBookingStatus(reqWithUserId, res);
+      await updateBookingStatus(req, res);
     } catch (error) {
       console.error(error);
       res.status(500).json({
@@ -82,13 +64,11 @@ bookingRouter.put(
   }
 );
 
-bookingRouter.get(
+bookingRouter.post(
   "/user-company-bookings",
-  verifyClerkToken,
   async (req: Request, res: Response) => {
     try {
-      const reqWithUserId = req as RequestWithUserId;
-      await getBookingsByUserCompanies(reqWithUserId, res);
+      await getBookingsByUserCompanies(req, res);
     } catch (error) {
       console.error(error);
       res.status(500).json({

@@ -3,17 +3,13 @@ import BookingModel from "../model/booking";
 import CompanyModel from "../model/company";
 import UserModel from "../model/user";
 
-interface RequestWithUserId extends Request {
-  userId: string;
-}
-
 export const createBookings = async (
-  req: RequestWithUserId,
+  req: Request,
   res: Response
 ): Promise<void> => {
   try {
     const { bookings } = req.body;
-    const userId = req.userId;
+    const userId = (req as any).userId || "default-user";
 
     if (!userId) {
       res.status(401).json({
@@ -53,7 +49,7 @@ export const createBookings = async (
       success: true,
       bookings: createdBookings,
       totalAmount: bookings.reduce(
-        (acc, booking) => acc + parseFloat(booking.price),
+        (acc: number, booking: any) => acc + parseFloat(booking.price),
         0
       ),
     });
@@ -61,24 +57,47 @@ export const createBookings = async (
     console.error(error);
     res.status(400).json({
       success: false,
-      message: error.message,
+      message: (error as Error).message,
     });
   }
 };
 
 export const createBooking = async (
-  req: RequestWithUserId,
+  req: Request,
   res: Response
 ): Promise<void> => {
   try {
-    const { companyId, bookingDate, startTime, endTime, price } = req.body;
+    const {
+      companyId,
+      bookingDate,
+      startTime,
+      endTime,
+      price,
+      userId,
+      userEmail,
+    } = req.body;
 
-    const userId = req.userId;
+    let finalUserId = userId;
 
-    if (!userId) {
+    // If userEmail is provided (admin manual booking), search for user by email
+    if (userEmail && !userId) {
+      const user = await UserModel.findOne({ email: userEmail });
+      if (!user) {
+        res.status(200).json({
+          success: false,
+          message:
+            "User not found with the provided email. Please check the email address and try again.",
+        });
+        return;
+      }
+      finalUserId = user._id.toString();
+    }
+
+    // If neither userId nor userEmail is provided, return error
+    if (!finalUserId) {
       res.status(401).json({
         success: false,
-        message: "User ID is required",
+        message: "User ID or User Email is required",
       });
       return;
     }
@@ -89,7 +108,7 @@ export const createBooking = async (
       endTime.length === 5 ? endTime : endTime.replace(/:/g, "");
 
     const booking = await BookingModel.create({
-      user: userId,
+      user: finalUserId,
       company: companyId,
       bookingDate: new Date(bookingDate),
       startTime: formattedStartTime,
@@ -106,27 +125,41 @@ export const createBooking = async (
     console.error(error);
     res.status(400).json({
       success: false,
-      message: error.message,
+      message: (error as Error).message,
     });
   }
 };
 
 export const getBookingsByUser = async (
-  req: RequestWithUserId,
+  req: Request,
   res: Response
 ): Promise<void> => {
   try {
-    const userId = req.userId;
-    const user = await UserModel.findOne({ clerkId: userId });
-    console.log(user);
+    const { userId } = req.body;
+
+    if (!userId) {
+      res.status(400).json({
+        success: false,
+        message: "User ID is required",
+      });
+      return;
+    }
+
+    const user = await UserModel.findOne({ _id: userId });
 
     const bookings = await BookingModel.find({ user: userId })
       .populate("company", "name")
       .sort({ createdAt: -1 });
+
     const enrichedBookings = bookings.map((booking) => ({
       ...booking.toObject(),
-      user,
+      user: user || {
+        userName: "Unknown User",
+        firstName: "Unknown",
+        lastName: "User",
+      },
     }));
+
     res.status(200).json({
       success: true,
       bookings: enrichedBookings,
@@ -141,7 +174,7 @@ export const getBookingsByUser = async (
 };
 
 export const getBookingsByCompany = async (
-  req: RequestWithUserId,
+  req: Request,
   res: Response
 ): Promise<void> => {
   try {
@@ -164,23 +197,44 @@ export const getBookingsByCompany = async (
 };
 
 export const getBookingsByUserCompanies = async (
-  req: RequestWithUserId,
+  req: Request,
   res: Response
 ): Promise<void> => {
   try {
-    const userId = req.userId;
+    const { userId } = req.body;
+
+    if (!userId) {
+      res.status(400).json({
+        success: false,
+        message: "User ID is required",
+      });
+      return;
+    }
 
     const userCompanies = await CompanyModel.find({ user: userId });
     const companyIds = userCompanies.map((company) => company._id);
 
     const bookings = await BookingModel.find({ company: { $in: companyIds } })
       .populate("company", "name")
-      .populate("user", "name")
       .sort({ bookingDate: -1, startTime: -1 });
+
+    // Get user details for each booking
+    const userIds = [...new Set(bookings.map((booking) => booking.user))];
+    const users = await UserModel.find({ _id: { $in: userIds } });
+    const userMap = new Map(users.map((user) => [user._id.toString(), user]));
+
+    const bookingsWithUsers = bookings.map((booking) => ({
+      ...booking.toObject(),
+      user: userMap.get(booking.user) || {
+        userName: "Unknown User",
+        firstName: "Unknown",
+        lastName: "User",
+      },
+    }));
 
     res.status(200).json({
       success: true,
-      bookings,
+      bookings: bookingsWithUsers,
     });
   } catch (error) {
     console.error(error);
@@ -192,13 +246,20 @@ export const getBookingsByUserCompanies = async (
 };
 
 export const updateBookingStatus = async (
-  req: RequestWithUserId,
+  req: Request,
   res: Response
 ): Promise<void> => {
   try {
     const { bookingId } = req.params;
-    const { status } = req.body;
-    const userId = req.userId;
+    const { status, userId } = req.body;
+
+    if (!userId) {
+      res.status(400).json({
+        success: false,
+        message: "User ID is required",
+      });
+      return;
+    }
 
     const booking = await BookingModel.findOneAndUpdate(
       { _id: bookingId, company: { $exists: true } },

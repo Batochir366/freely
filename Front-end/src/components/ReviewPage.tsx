@@ -13,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import axiosInstance from "@/utils/axios";
 import { useParams } from "next/navigation";
-import { useAuth } from "@clerk/nextjs";
+// Authentication removed - no Clerk dependencies
 import { Card } from "./ui/card";
 
 interface SuggestionFormData {
@@ -32,7 +32,7 @@ interface Review {
 }
 
 export default function ReviewsPage() {
-  const { userId } = useAuth();
+  // Authentication removed - no userId required
   const params = useParams();
   const [reviews, setReviews] = useState<Review[]>([]);
 
@@ -155,11 +155,7 @@ export default function ReviewsPage() {
     try {
       setIsSubmitting(true);
 
-      if (!userId) {
-        window.location.href = "/sign-in";
-        return;
-      }
-
+      // Authentication removed - no userId check required
       const response = await axiosInstance.post("/review/create-review", {
         companyId: params.id,
         name: formData.name.trim(),

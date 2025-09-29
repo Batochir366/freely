@@ -6,28 +6,20 @@ import {
   getReviewsByCompany,
   getReviewsByUserCompanies,
 } from "../controllers/review";
-import {
-  RequestWithUserId,
-  verifyClerkToken,
-} from "../middleware/checkClerkToken";
 
 export const reviewsRouter = express.Router();
 
-reviewsRouter.post(
-  "/create-review",
-  verifyClerkToken,
-  async (req: Request, res: Response) => {
-    try {
-      await createReview(req, res);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({
-        success: false,
-        message: "Internal server error",
-      });
-    }
+reviewsRouter.post("/create-review", async (req: Request, res: Response) => {
+  try {
+    await createReview(req, res);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
   }
-);
+});
 
 reviewsRouter.get(
   "/reviews/:companyId",
@@ -44,13 +36,11 @@ reviewsRouter.get(
   }
 );
 
-reviewsRouter.get(
+reviewsRouter.post(
   "/user-company-reviews",
-  verifyClerkToken,
   async (req: Request, res: Response) => {
     try {
-      const reqWithUserId = req as RequestWithUserId;
-      await getReviewsByUserCompanies(reqWithUserId, res);
+      await getReviewsByUserCompanies(req, res);
     } catch (error) {
       console.error(error);
       res.status(500).json({
@@ -63,7 +53,6 @@ reviewsRouter.get(
 
 reviewsRouter.delete(
   "/delete-review/:reviewId",
-  verifyClerkToken,
   async (req: Request, res: Response) => {
     try {
       await deleteReview(req, res);

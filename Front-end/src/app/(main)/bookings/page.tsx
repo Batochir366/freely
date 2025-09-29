@@ -1,11 +1,16 @@
 "use client";
 
-import { BackgroundBoxesDemo } from "@/components/Backboxdemo";
+import { BookingDashboard } from "@/components/booking-dashboard";
+import { AuthGuard } from "@/components/AuthGuard";
 
 export default function Recommendation() {
   return (
-    <div className="w-full h-full">
-      <BackgroundBoxesDemo />
-    </div>
+    <AuthGuard>
+      <div className="min-h-screen bg-black text-white">
+        <div className="pt-[50px]">
+          <BookingDashboard />
+        </div>
+      </div>
+    </AuthGuard>
   );
 }

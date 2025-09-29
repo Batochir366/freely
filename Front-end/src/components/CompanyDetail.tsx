@@ -59,7 +59,7 @@ export const CompanyDetail = () => {
   }, [getCompanyId]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 text-white">
+    <div className="min-h-screen bg-black text-white">
       <div className="pt-[50px]">
         <CompanyName avatarURL={data?.companyLogo} name={data?.name} />
       </div>

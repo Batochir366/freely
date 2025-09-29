@@ -8,44 +8,15 @@ import {
   getCompanyById,
   updateCompany,
 } from "../controllers/company";
-import { verifyClerkToken } from "../middleware/checkClerkToken";
-
-interface RequestWithUserId extends Request {
-  userId: string;
-}
 
 export const companyRouter = express.Router();
 
 companyRouter
-  .post("/create-company", verifyClerkToken, (req: Request, res: Response) => {
-    const reqWithUserId = req as RequestWithUserId;
-    return createCompany(reqWithUserId, res);
-  })
-  .get("/get-companies", getCompanies)
-  .get(
-    "/get-companies-by-user",
-    verifyClerkToken,
-    (req: Request, res: Response) => {
-      const reqWithUserId = req as RequestWithUserId;
-      return getCompaniesByUser(reqWithUserId, res);
-    }
-  )
-  .get("/get-company/:companyId", getCompanyById)
-  .put(
-    "/update-company/:companyId",
-    verifyClerkToken,
-    (req: Request, res: Response) => {
-      const reqWithUserId = req as RequestWithUserId;
-      return updateCompany(reqWithUserId, res);
-    }
-  )
-  .delete(
-    "/delete-company/:companyId",
-    verifyClerkToken,
-    (req: Request, res: Response) => {
-      const reqWithUserId = req as RequestWithUserId;
-      return deleteCompany(reqWithUserId, res);
-    }
-  );
+  .post("/create-company", createCompany as any)
+  .get("/get-companies", getCompanies as any)
+  .post("/get-companies-by-user", getCompaniesByUser as any)
+  .get("/get-company/:companyId", getCompanyById as any)
+  .post("/update-company/:companyId", updateCompany as any)
+  .post("/delete-company/:companyId", deleteCompany as any);
 
 export default companyRouter;

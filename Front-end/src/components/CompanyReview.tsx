@@ -36,7 +36,6 @@ import axiosInstance from "@/utils/axios";
 
 interface User {
   _id: string;
-  clerkId: string;
   email: string;
   userName: string;
   firstName: string;
@@ -388,8 +387,17 @@ export default function AdminReviewsTable() {
         setLoading(true);
         setError(null);
 
-        const response = await axiosInstance.get(
-          "/review/user-company-reviews"
+        // Get userId from localStorage or context
+        const userId = localStorage.getItem("userId");
+        if (!userId) {
+          setError("User not authenticated");
+          setLoading(false);
+          return;
+        }
+
+        const response = await axiosInstance.post(
+          "/review/user-company-reviews",
+          { userId }
         );
 
         if (response.data.success) {

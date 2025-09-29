@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -30,7 +30,8 @@ import { CalendarIcon, Clock, Plus } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import axiosInstance from "@/utils/axios";
-import { useRouter } from "next/navigation";
+import { useAuth } from "@/app/context/AuthContext";
+import { useToast } from "@/app/hooks/use-toast";
 
 const timeSlots = [
   "08:00",
@@ -57,7 +58,7 @@ const timeSlots = [
 ];
 
 interface BookingFormData {
-  user: string;
+  userEmail: string;
   company: string;
   bookingDate: Date | undefined;
   startTime: string;
@@ -72,8 +73,10 @@ interface Company {
 }
 
 export default function AdminBookingForm() {
+  const { user } = useAuth();
+  const { toast } = useToast();
   const [formData, setFormData] = useState<BookingFormData>({
-    user: "",
+    userEmail: "",
     company: "",
     bookingDate: new Date(),
     startTime: "",
@@ -82,12 +85,13 @@ export default function AdminBookingForm() {
     status: "booked",
   });
   const [companies, setCompanies] = useState<Company[]>([]);
-  const router = useRouter();
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
-  const fetchCompanies = async () => {
+  const fetchCompanies = useCallback(async () => {
     try {
-      const response = await axiosInstance.get(
-        "/company/get-companies-by-user"
+      const response = await axiosInstance.post(
+        "/company/get-companies-by-user",
+        { userId: user?._id }
       );
       if (response.data?.success && response.data?.companies) {
         setCompanies(response.data.companies);
@@ -95,33 +99,34 @@ export default function AdminBookingForm() {
     } catch (error) {
       console.error("Error fetching companies:", error);
     }
-  };
+  }, [user?._id]);
 
   useEffect(() => {
     fetchCompanies();
-  }, []);
+  }, [fetchCompanies]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setErrorMessage(""); // Clear any previous error messages
 
     if (
-      !formData.user ||
+      !formData.userEmail ||
       !formData.company ||
       !formData.bookingDate ||
       !formData.startTime ||
       !formData.endTime ||
       !formData.price
     ) {
-      alert("Please fill in all required fields");
+      setErrorMessage("Please fill in all required fields");
       setIsSubmitting(false);
       return;
     }
 
     if (formData.startTime >= formData.endTime) {
-      alert("End time must be after start time");
+      setErrorMessage("End time must be after start time");
       setIsSubmitting(false);
       return;
     }
@@ -129,59 +134,81 @@ export default function AdminBookingForm() {
     try {
       const formattedDate = format(formData.bookingDate, "yyyy-MM-dd");
 
-      await axiosInstance.post("/booking/create-booking", {
-        user: formData.user,
+      const response = await axiosInstance.post("/booking/create-booking", {
+        userEmail: formData.userEmail,
         companyId: formData.company,
         startTime: formData.startTime,
-
         endTime: formData.endTime,
         status: formData.status,
         price: formData.price,
         bookingDate: formattedDate,
       });
 
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Check if the response indicates success
+      if (response.data.success) {
+        // Show success toast
+        toast({
+          title: "Booking Created Successfully!",
+          description: "The booking has been created and added to the system.",
+        });
 
-      setFormData({
-        user: "",
-        company: "",
-        bookingDate: undefined,
-        startTime: "",
-        endTime: "",
-        price: "",
-        status: "booked",
-      });
+        // Reset form
+        setFormData({
+          userEmail: "",
+          company: "",
+          bookingDate: undefined,
+          startTime: "",
+          endTime: "",
+          price: "",
+          status: "booked",
+        });
 
-      router.push("/admin/dashboard");
+        // Close modal by refreshing the page or triggering a close event
+        window.location.reload();
+      } else {
+        // Show error message in modal
+        setErrorMessage(
+          response.data.message || "There was an error creating the booking."
+        );
+      }
     } catch (error) {
       console.error("Error creating booking:", error);
+      setErrorMessage(
+        "There was an error creating the booking. Please try again."
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Plus className="h-5 w-5" />
+    <Card className="w-full max-w-2xl mx-auto border-0 shadow-none">
+      <CardHeader className="pb-4">
+        <CardTitle className="flex items-center gap-2 text-lg">
+          <Plus className="h-4 w-4" />
           Create New Booking
         </CardTitle>
-        <CardDescription>
-          Create a new booking for a user with a selected company and time slot.
+        <CardDescription className="text-sm">
+          Create a new booking by entering the user&apos;s email address,
+          company, and time slot.
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
+      <CardContent className="pt-0">
+        {errorMessage && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+            <p className="text-sm text-red-600">{errorMessage}</p>
+          </div>
+        )}
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="user">User *</Label>
+            <Label htmlFor="userEmail">User Email *</Label>
             <Input
-              id="user"
-              type="string"
-              placeholder="Enter user name"
-              value={formData.user}
+              id="userEmail"
+              type="email"
+              placeholder="Enter user email"
+              value={formData.userEmail}
               onChange={(e) =>
-                setFormData((prev) => ({ ...prev, user: e.target.value }))
+                setFormData((prev) => ({ ...prev, userEmail: e.target.value }))
               }
             />
           </div>

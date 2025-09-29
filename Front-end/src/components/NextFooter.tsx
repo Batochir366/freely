@@ -94,14 +94,14 @@ export const EnhancedFooter = () => {
 
       <div className="relative container mx-auto px-4 py-16">
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 gap-60 md:grid-cols-2 lg:grid-cols-3  pb-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 pb-10">
           {/* Company Info */}
           <motion.div variants={itemVariants} className="lg:col-span-1">
             <motion.h3
               className="mb-6 text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent"
               whileHover={{ scale: 1.05 }}
             >
-              TimeMaster
+              Freely
             </motion.h3>
             <motion.div
               className="mb-6 h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"
@@ -111,34 +111,9 @@ export const EnhancedFooter = () => {
               transition={{ delay: 0.5, duration: 0.8 }}
             />
             <p className="mb-6 text-slate-300 leading-relaxed">
-              Цагаа ухаалгаар зарцуулж, амжилтад хүрцгээе! Өдөр бүрийг үр дүнтэй
-              өнгөрүүлэх нь амжилтын түлхүүр.
+              Discover amazing activities and experiences. Book your next
+              adventure with ease and make every moment count.
             </p>
-
-            {/* Contact Info */}
-            <div className="space-y-3 text-sm text-slate-400">
-              <motion.div
-                className="flex items-center gap-3"
-                whileHover={{ x: 5, color: "#a855f7" }}
-              >
-                <Mail size={16} />
-                <span>Freely.com</span>
-              </motion.div>
-              <motion.div
-                className="flex items-center gap-3"
-                whileHover={{ x: 5, color: "#a855f7" }}
-              >
-                <Phone size={16} />
-                <span>+976 9999-9999</span>
-              </motion.div>
-              <motion.div
-                className="flex items-center gap-3"
-                whileHover={{ x: 5, color: "#a855f7" }}
-              >
-                <MapPin size={16} />
-                <span>Ulaanbaatar, Mongolia</span>
-              </motion.div>
-            </div>
 
             {/* Social Icons */}
             <div className="flex space-x-4 mt-8">
@@ -171,7 +146,85 @@ export const EnhancedFooter = () => {
             </div>
           </motion.div>
 
-          {/* Newsletter & Extra Links */}
+          {/* Quick Links */}
+          <motion.div variants={itemVariants}>
+            <h4 className="text-lg font-semibold text-white mb-6">
+              Quick Links
+            </h4>
+            <ul className="space-y-3">
+              {[
+                { name: "Home", href: "/" },
+                { name: "Explore", href: "/Explore" },
+                { name: "Bookings", href: "/bookings" },
+                { name: "About Us", href: "/AboutUs" },
+              ].map((link) => (
+                <motion.li
+                  key={link.name}
+                  whileHover={{ x: 5, color: "#a855f7" }}
+                >
+                  <a
+                    href={link.href}
+                    className="text-slate-400 hover:text-purple-400 transition-colors"
+                  >
+                    {link.name}
+                  </a>
+                </motion.li>
+              ))}
+            </ul>
+          </motion.div>
+
+          {/* Support */}
+          <motion.div variants={itemVariants}>
+            <h4 className="text-lg font-semibold text-white mb-6">Support</h4>
+            <ul className="space-y-3">
+              {[
+                { name: "Help Center", href: "#" },
+                { name: "Contact Us", href: "#" },
+                { name: "Privacy Policy", href: "#" },
+                { name: "Terms of Service", href: "#" },
+              ].map((link) => (
+                <motion.li
+                  key={link.name}
+                  whileHover={{ x: 5, color: "#a855f7" }}
+                >
+                  <a
+                    href={link.href}
+                    className="text-slate-400 hover:text-purple-400 transition-colors"
+                  >
+                    {link.name}
+                  </a>
+                </motion.li>
+              ))}
+            </ul>
+          </motion.div>
+
+          {/* Contact Info */}
+          <motion.div variants={itemVariants}>
+            <h4 className="text-lg font-semibold text-white mb-6">Contact</h4>
+            <div className="space-y-3 text-sm text-slate-400">
+              <motion.div
+                className="flex items-center gap-3"
+                whileHover={{ x: 5, color: "#a855f7" }}
+              >
+                <Mail size={16} />
+                <span>info@freely.com</span>
+              </motion.div>
+              <motion.div
+                className="flex items-center gap-3"
+                whileHover={{ x: 5, color: "#a855f7" }}
+              >
+                <Phone size={16} />
+                <span>+1 (555) 123-4567</span>
+              </motion.div>
+              <motion.div
+                className="flex items-center gap-3"
+                whileHover={{ x: 5, color: "#a855f7" }}
+              >
+                <MapPin size={16} />
+                <span>New York, USA</span>
+              </motion.div>
+            </div>
+          </motion.div>
         </div>
 
         {/* Bottom Section */}
@@ -185,7 +238,7 @@ export const EnhancedFooter = () => {
               whileHover={{ color: "#a855f7" }}
             >
               <Heart size={16} className="text-red-400" />©
-              {new Date().getFullYear()} TimeMaster. Secured by pinecone.
+              {new Date().getFullYear()} Freely. All rights reserved.
             </motion.p>
           </div>
         </motion.div>

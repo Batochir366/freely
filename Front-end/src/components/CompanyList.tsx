@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Edit } from "lucide-react";
 import axiosInstance from "@/utils/axios";
+import { useAuth } from "@/app/context/AuthContext";
 
 interface Company {
   _id: string;
@@ -25,17 +26,15 @@ interface Company {
 }
 
 export const CompanyList = () => {
+  const { user } = useAuth();
   const [companies, setCompanies] = useState<Company[]>([]);
   const router = useRouter();
 
-  useEffect(() => {
-    fetchCompanies();
-  }, []);
-
-  const fetchCompanies = async () => {
+  const fetchCompanies = useCallback(async () => {
     try {
-      const response = await axiosInstance.get(
-        "/company/get-companies-by-user"
+      const response = await axiosInstance.post(
+        "/company/get-companies-by-user",
+        { userId: user?._id }
       );
       if (response.data?.success && response.data?.companies) {
         setCompanies(response.data.companies);
@@ -43,7 +42,11 @@ export const CompanyList = () => {
     } catch (error) {
       console.error("Error fetching companies:", error);
     }
-  };
+  }, [user?._id]);
+
+  useEffect(() => {
+    fetchCompanies();
+  }, [fetchCompanies]);
 
   const handleEdit = (companyId: string) => {
     router.push(`/admin/settings/${companyId}`);

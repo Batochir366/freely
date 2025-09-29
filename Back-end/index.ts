@@ -16,7 +16,7 @@ const publicRouter = express.Router();
 
 configDotenv();
 
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 8000;
 
 connectMongoDB();
 
@@ -40,5 +40,5 @@ const server = http.createServer(app);
 initWebSocket(server);
 
 server.listen(port, () => {
-  console.log(`Server running at PORT: ${port}`);
+  console.log(`Server running at PORT: http://localhost:${port}`);
 });
