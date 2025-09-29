@@ -11,8 +11,5 @@
       "src": "/(.*)",
       "dest": "dist/index.js"
     }
-  ],
-  "env": {
-    "MONGODB_URL": "@mongodb_url"
-  }
+  ]
 }
