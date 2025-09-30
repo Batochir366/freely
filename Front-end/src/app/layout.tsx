@@ -1,4 +1,5 @@
 "use client";
+
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { CategoryProvider } from "./context/CategoryContext";
@@ -16,6 +17,15 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+// ✅ Minimal favicon setup using only SVG
+export const metadata = {
+  title: "My Website",
+  description: "Next.js site with favicon",
+  icons: {
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+  },
+};
 
 function RootLayout({
   children,
