@@ -32,8 +32,8 @@ export const scanQrCode = (req: Request, res: Response) => {
         <span class="text-3xl">✅</span>
       </div>
       <h1 class="mt-4 text-2xl font-semibold text-emerald-800">Booking Confirmed</h1>
-      <p class="mt-2 text-sm text-slate-500">Спасибо — your booking has been confirmed successfully.</p>
-      <a href="/" class="mt-6 inline-block px-5 py-2 rounded-lg bg-emerald-600 text-white font-medium">Back to Home</a>
+      <p class="mt-2 text-sm text-slate-500">your booking has been confirmed successfully.</p>
+      <a href="https://freely-frontend-one.vercel.app/bookings" class="mt-6 inline-block px-5 py-2 rounded-lg bg-emerald-600 text-white font-medium">Back to Bookings</a>
     </div>
   </body>
 </html>

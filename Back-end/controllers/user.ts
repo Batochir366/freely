@@ -28,7 +28,7 @@ export const createUser = async (req: Request, res: Response): Promise<any> => {
         firstName,
         lastName,
         photo,
-        isAdmin: true, // All new users are admins by default
+        isAdmin: false, // All new users are admins by default
       });
       return res
         .status(200)
