@@ -1,3 +1,4 @@
+"use client";
 import axiosInstance from "@/utils/axios";
 import React, { createContext, useContext, useEffect, useState } from "react";
 

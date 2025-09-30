@@ -1,5 +1,3 @@
-"use client";
-
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { CategoryProvider } from "./context/CategoryContext";
@@ -18,20 +16,20 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// ✅ Minimal favicon setup using only SVG
+// ✅ Server component metadata
 export const metadata = {
-  title: "My Website",
+  title: "freely",
   description: "Next.js site with favicon",
   icons: {
     icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
   },
 };
 
-function RootLayout({
+export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
       <body
@@ -51,5 +49,3 @@ function RootLayout({
     </html>
   );
 }
-
-export default RootLayout;
