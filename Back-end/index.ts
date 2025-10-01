@@ -16,12 +16,13 @@ const publicRouter = express.Router();
 
 configDotenv();
 
-const port = process.env.PORT || 8080;
+const port = 8080;
 
 connectMongoDB();
 
 app.use(cors());
 app.use(json());
+app.use("/uploads", express.static("uploads"));
 
 app.use("/category", categoryRouter);
 app.get("/pp", (req, res) => {

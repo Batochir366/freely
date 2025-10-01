@@ -29,7 +29,7 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await axiosInstance.get("/category/");
+        const res = await axiosInstance.get("/category/get-categories");
         setCategories(res.data.data);
       } catch (error) {
         console.error("Failed to fetch categories:", error);

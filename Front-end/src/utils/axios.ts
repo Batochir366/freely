@@ -1,5 +1,5 @@
 import axios from "axios";
-// const http = "http://localhost:8000";
+// const http = "http://localhost:8080";
 const https = "https://freely-backend-lztj.onrender.com";
 const axiosInstance = axios.create({
   baseURL: https,

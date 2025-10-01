@@ -52,18 +52,29 @@ export const getReviewsByCompany = async (
 
     // Get user details for each review (handle anonymous reviews)
     const userIds = [...new Set(reviews.map((review) => review.user))].filter(
-      (id) => id !== "anonymous"
+      (id) => id !== "anonymous" && id && id !== "default-user"
     );
-    const users = await UserModel.find({ _id: { $in: userIds } });
+
+    let users = [];
+    if (userIds.length > 0) {
+      users = await UserModel.find({ _id: { $in: userIds } });
+    }
     const userMap = new Map(users.map((user) => [user._id.toString(), user]));
 
     const reviewsWithUsers = reviews.map((review) => ({
       ...review.toObject(),
       user:
-        review.user === "anonymous"
-          ? { userName: review.name || "Anonymous", photo: null }
+        review.user === "anonymous" || !review.user
+          ? {
+              userName: review.name || "Anonymous",
+              firstName: review.name || "Anonymous",
+              lastName: "",
+              photo: null,
+            }
           : userMap.get(review.user) || {
-              userName: "Unknown User",
+              userName: review.name || "Unknown User",
+              firstName: review.name || "Unknown User",
+              lastName: "",
               photo: null,
             },
     }));
@@ -95,15 +106,22 @@ export const getReviewsByUserCompanies = async (
       company: { $in: companyIds },
     }).populate("company", "name");
 
-    const userIds = [...new Set(reviews.map((review) => review.user))];
+    const userIds = [...new Set(reviews.map((review) => review.user))].filter(
+      (id) => id && id !== "anonymous" && id !== "default-user"
+    );
 
-    const users = await UserModel.find({ _id: { $in: userIds } });
+    let users = [];
+    if (userIds.length > 0) {
+      users = await UserModel.find({ _id: { $in: userIds } });
+    }
     const userMap = new Map(users.map((user) => [user._id.toString(), user]));
 
     const reviewsWithUsers = reviews.map((review) => ({
       ...review.toObject(),
       user: userMap.get(review.user) || {
-        userName: "Unknown User",
+        userName: review.name || "Unknown User",
+        firstName: review.name || "Unknown User",
+        lastName: "",
         photo: null,
       },
     }));

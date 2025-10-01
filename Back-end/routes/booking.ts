@@ -6,7 +6,7 @@ import {
   getBookingsByCompany,
   updateBookingStatus,
   getBookingsByUserCompanies,
-} from "../controllers/booking";
+} from "../controllers/booking.ts";
 
 export const bookingRouter = express.Router();
 

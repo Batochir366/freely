@@ -5,7 +5,7 @@ import {
   deleteReview,
   getReviewsByCompany,
   getReviewsByUserCompanies,
-} from "../controllers/review";
+} from "../controllers/review.ts";
 
 export const reviewsRouter = express.Router();
 

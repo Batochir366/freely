@@ -7,7 +7,8 @@ import {
   getCompaniesByUser,
   getCompanyById,
   updateCompany,
-} from "../controllers/company";
+  companyUpload,
+} from "../controllers/company.ts";
 
 export const companyRouter = express.Router();
 
@@ -16,7 +17,14 @@ companyRouter
   .get("/get-companies", getCompanies as any)
   .post("/get-companies-by-user", getCompaniesByUser as any)
   .get("/get-company/:companyId", getCompanyById as any)
-  .post("/update-company/:companyId", updateCompany as any)
-  .post("/delete-company/:companyId", deleteCompany as any);
+  .put(
+    "/update-company/:companyId",
+    companyUpload.fields([
+      { name: "images", maxCount: 10 },
+      { name: "companyLogo", maxCount: 1 },
+    ]),
+    updateCompany as any
+  )
+  .delete("/delete-company/:companyId", deleteCompany as any);
 
 export default companyRouter;

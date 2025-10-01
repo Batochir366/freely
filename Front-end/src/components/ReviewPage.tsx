@@ -29,25 +29,49 @@ interface Review {
   comment: string;
   starCount: number;
   createdAt: string;
+  user: {
+    userName?: string;
+    firstName?: string;
+    lastName?: string;
+    photo?: string;
+  };
 }
 
 export default function ReviewsPage() {
   // Authentication removed - no userId required
   const params = useParams();
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchReview = useCallback(async () => {
     try {
+      setLoading(true);
+      setError(null);
+      console.log("Fetching reviews for company ID:", params.id);
+
       const res = await axiosInstance.get(`/review/reviews/${params.id}`);
-      setReviews(res.data.reviews);
+      console.log("Reviews API response:", res.data);
+
+      if (res.data.success && res.data.reviews) {
+        setReviews(res.data.reviews);
+      } else {
+        console.error("API returned success:false or no reviews");
+        setError("Failed to fetch reviews");
+      }
     } catch (error) {
-      console.log(error);
+      console.error("Error fetching reviews:", error);
+      setError("Error fetching reviews. Please try again.");
+    } finally {
+      setLoading(false);
     }
-  }, [params.id, setReviews]);
+  }, [params.id]);
 
   useEffect(() => {
-    fetchReview();
-  }, [fetchReview]);
+    if (params.id) {
+      fetchReview();
+    }
+  }, [fetchReview, params.id]);
 
   const [formData, setFormData] = useState<SuggestionFormData>({
     name: "",
@@ -254,10 +278,29 @@ export default function ReviewsPage() {
                   {/* Recent Reviews Preview */}
                   <div className="mt-8">
                     <h3 className="text-xl font-semibold mb-4 text-white">
-                      Recent Reviews
+                      Recent Reviews ({reviews.length})
                     </h3>
 
-                    {reviews.length === 0 ? (
+                    {loading ? (
+                      <div className="text-white/20 w-full border rounded-lg h-[100px] flex items-center justify-center text-center">
+                        <div className="flex items-center gap-2">
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                          Loading reviews...
+                        </div>
+                      </div>
+                    ) : error ? (
+                      <div className="text-red-400 w-full border border-red-400 rounded-lg h-[100px] flex items-center justify-center text-center">
+                        <div className="text-center">
+                          <p className="text-red-400 mb-2">{error}</p>
+                          <button
+                            onClick={fetchReview}
+                            className="text-sm text-red-300 hover:text-red-200 underline"
+                          >
+                            Try again
+                          </button>
+                        </div>
+                      </div>
+                    ) : reviews.length === 0 ? (
                       <div className="text-white/20 w-full border rounded-lg h-[100px] flex items-center justify-center text-center">
                         No reviews on this company
                       </div>

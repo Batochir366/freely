@@ -520,26 +520,26 @@ export default function AdminReviewsTable() {
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-4">
-              <div className="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-lg border border-blue-200">
+              <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg border border-gray-200">
                 <Building2 className="h-5 w-5 text-blue-600" />
-                <span className="font-semibold text-blue-900">
+                <span className="font-semibold text-gray-900">
                   {companies.length}
                 </span>
-                <span className="text-blue-700">Companies</span>
+                <span className="text-gray-700">Companies</span>
               </div>
-              <div className="flex items-center gap-2 bg-green-50 px-4 py-2 rounded-lg border border-green-200">
+              <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg border border-gray-200">
                 <MessageSquare className="h-5 w-5 text-green-600" />
-                <span className="font-semibold text-green-900">
+                <span className="font-semibold text-gray-900">
                   {totalReviews}
                 </span>
-                <span className="text-green-700">Reviews</span>
+                <span className="text-gray-700">Reviews</span>
               </div>
-              <div className="flex items-center gap-2 bg-amber-50 px-4 py-2 rounded-lg border border-amber-200">
+              <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg border border-gray-200">
                 <Star className="h-5 w-5 text-amber-600 fill-amber-600" />
-                <span className="font-semibold text-amber-900">
+                <span className="font-semibold text-gray-900">
                   {overallAverageRating.toFixed(1)}
                 </span>
-                <span className="text-amber-700">Average</span>
+                <span className="text-gray-700">Average</span>
               </div>
             </div>
           </div>
